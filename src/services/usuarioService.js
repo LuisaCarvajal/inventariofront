@@ -1,21 +1,21 @@
 import{axiosInstance} from '../helpers/axios-config';
 
-const getMarcas = () =>{
-    return axiosInstance.get('marca', {
+const getUsuarios = (usuarioId) =>{
+    return axiosInstance.get('usuario', {
         headers:{
             'content-type': 'application/json'
         }
     });
 }
-const crearMarca = (data) =>{
-    return axiosInstance.post('marca', data,{
+const crearUsuario = (data) =>{
+    return axiosInstance.post('usuario', data,{
         headers:{
             'content-type': 'application/json'
         }
     });
 }
-const editMarca = (marcaId,data) => {
-    return axiosInstance.put(`inventario/${marcaId}`, data, {
+const editUsuario = (usuarioId,data) => {
+    return axiosInstance.put(`inventario/${usuarioId}`, data, {
         headers: {
             'content-type': 'application/json'
         }
@@ -23,5 +23,5 @@ const editMarca = (marcaId,data) => {
 } 
 
 export{
-    getMarcas, crearMarca, editMarca
+    getUsuarios, crearUsuario, editUsuario
 }

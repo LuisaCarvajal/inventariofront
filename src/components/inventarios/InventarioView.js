@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 import { getInventarios } from '../../services/inventarioService'
 import {InventarioCard} from './InventarioCard';
 import{InventarioNew} from './InventarioNew';
-
+import Swal from "sweetalert2";
 
 export const InventarioView = () => {
 
@@ -10,14 +10,18 @@ export const InventarioView = () => {
   const [openModal, setOpenModal ] = useState(false);
 
   const listarInventarios = async () => {
-
     try{
-      const {data} = await getInventarios();
-      console.log(data);
+      Swal.fire({
+        allowOutsideClick: false, 
+        text: 'Cargando...'
+    });
+    Swal.showLoading();  
+      const {data} = await getInventarios();     
       setInventarios(data);
-
+      Swal.close();      
     }catch (error){
       console.log(error);
+      Swal.close();      
     }
   }
 

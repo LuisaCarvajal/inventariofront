@@ -1,7 +1,7 @@
 import React,{useState, useEffect} from 'react'
-import{getUsuarios} from '../../services/usarioService';
+import{getUsuarios} from '../../services/usuarioService';
 import{getMarcas} from '../../services/marcaService';
-import{getTiposEquipos} from '../../services/tipoEquipoService';
+import{getTipoEquipos} from '../../services/tipoEquipoService';
 import{getEstadosEquipos} from '../../services/estadoEquipoService';
 import {crearInventario} from'../../services/inventarioService'
 import  Swal from 'sweetalert2'
@@ -44,7 +44,7 @@ export const InventarioNew = ({handleOpenModal, listarInventarios}) => {
 
     const listarTipos = async () =>{
         try{
-            const {data} = await getTiposEquipos();        
+            const {data} = await getTipoEquipos();        
             setTipos(data);
         }catch (error){
             console.log(error);
@@ -73,8 +73,7 @@ export const InventarioNew = ({handleOpenModal, listarInventarios}) => {
     }
 
     const handleOnSubmit =  async (e) => {
-        e.preventDefault();
-        console.log();
+        e.preventDefault();      
         const inventario ={
             serial, modelo, descripcion, color, foto,
             fechacompra,  precio,usuario:{
@@ -90,8 +89,7 @@ export const InventarioNew = ({handleOpenModal, listarInventarios}) => {
             EstadoEquipo:{
                 _id:estado
             }            
-        }
-        console.log(inventario);
+        }    
         try {
             Swal.fire({
                 allowOutsideClick: false, 
@@ -106,6 +104,14 @@ export const InventarioNew = ({handleOpenModal, listarInventarios}) => {
         }catch(error) {
             console.log(error);
             Swal.close();
+            let mensaje;
+      if (error && error.response && error.response.data) {
+        mensaje = error.response.data;
+      } else{
+        mensaje = ' Ocurrio un error, por favor intente de nuevo';
+      }
+      
+      Swal.fire('Error', mensaje,'error');
         }
     }
 
