@@ -1,16 +1,18 @@
 import React, {useState, useEffect} from 'react'
-import {getMarcas, crearMarca} from '../../services/marcaService';
+import { useParams } from 'react-router-dom';
+import {getMarcas, crearMarca, editMarca} from '../../services/marcaService';
 
 export const MarcaView = () =>{
 
   const [valoresForm, setValoresForm] = useState({});
-  const [ marcas, setMarcas ]= useState([]);
+  const [ marcas, setMarcas ]= useState({});
   const { nombre='', estado=''} = valoresForm;
+  const {marcaId=''} = useParams
 
   const listarMarcas = async () => {
     try{
-      const resp = await getMarcas();
-      setMarcas(resp.data);
+      const {data} = await getMarcas();
+      setMarcas(data);
     }catch(error){
       console.log(error);
     }
@@ -20,12 +22,24 @@ export const MarcaView = () =>{
     listarMarcas();
    }, []);
 
+   useEffect(() => {
+    setValoresForm({
+      nombre: marcas.nombre,
+      estado: marcas.estado
+
+    })
+   }, [marcas])
+
   const handleOnchange =  (e) => {
     setValoresForm ({...valoresForm, [e.target.name]: e.target.value});
   }
    const handlecrearMarca = async (e) => {
     e.preventDefault();
     console.log(valoresForm);
+    if (valoresForm.id) {
+      await editMarca(valoresForm.id, valoresForm)
+      await listarMarcas();
+    }
     try{
       const resp = await crearMarca(valoresForm);
       console.log(resp.data);
@@ -33,6 +47,14 @@ export const MarcaView = () =>{
     }catch (error){
       console.log(error);
     }
+   }
+   const handleEditMarca = async (e, marca) => {
+    e.preventDefault();
+    setValoresForm ({
+      nombre: marca.nombre,
+      estado: marca.estado,
+      id: marca._id
+    });
    }
 
 return(
@@ -66,10 +88,13 @@ return(
       <tbody>
 
       {
-        marcas.map( marca => { 
+        marcas.length > 0 && marcas.map( marca => { 
         return <tr> 
           <td>{marca.nombre}</td> 
-          <td>{marca.estado}</td>         
+          <td>{marca.estado}</td> 
+          <td><button className="btn btn-primary"onClick={(e) => handleEditMarca(e, marca)}> Editar
+          </button>
+            </td>  
 
         </tr> 
         })

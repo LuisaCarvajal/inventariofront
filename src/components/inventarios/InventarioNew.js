@@ -1,7 +1,7 @@
 import React,{useState, useEffect} from 'react'
 import{getUsuarios} from '../../services/usuarioService';
 import{getMarcas} from '../../services/marcaService';
-import{getTipoEquipos} from '../../services/tipoEquipoService';
+import{getTiposEquipos} from '../../services/tipoEquipoService';
 import{getEstadosEquipos} from '../../services/estadoEquipoService';
 import {crearInventario} from'../../services/inventarioService'
 import  Swal from 'sweetalert2'
@@ -44,7 +44,7 @@ export const InventarioNew = ({handleOpenModal, listarInventarios}) => {
 
     const listarTipos = async () =>{
         try{
-            const {data} = await getTipoEquipos();        
+            const {data} = await getTiposEquipos();        
             setTipos(data);
         }catch (error){
             console.log(error);

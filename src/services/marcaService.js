@@ -15,7 +15,7 @@ const crearMarca = (data) =>{
     });
 }
 const editMarca = (marcaId,data) => {
-    return axiosInstance.put(`inventario/${marcaId}`, data, {
+    return axiosInstance.put(`marca/${marcaId}`, data, {
         headers: {
             'content-type': 'application/json'
         }

@@ -1,11 +1,13 @@
 import React,  { useState, useEffect} from 'react'
 import { getUsuarios, crearUsuario,editUsuario }   from '../../services/usuarioService'; 
+import { useParams } from 'react-router-dom';
 
 export const UsuarioView = () => {
 
   const [valoresForm, setValoresForm]= useState({}); 
   const [ usuarios, setUsuarios ] = useState([]);
  const { nombre = '', email= '', estado = '' } = valoresForm; 
+ const {usuarioId =''} = useParams();
 
 
 const listarUsuarios = async () => { 
@@ -19,6 +21,13 @@ useEffect( () => {
   listarUsuarios();
  }, []);
 
+ useEffect(() => {
+  setValoresForm({
+    nombre: usuarios.nombre,
+    estado: usuarios.estado,
+  })
+}, [usuarios]);
+
  const handleOnChange =  (e) => {
   setValoresForm ({...valoresForm, [e.target.name]: e.target.value});
 }
@@ -26,6 +35,11 @@ useEffect( () => {
 const handlecrearUsuario = async (e) => { 
   e.preventDefault();
    console.log(valoresForm); 
+   if (valoresForm.id) {
+    await editUsuario(valoresForm.id, valoresForm)
+    await listarUsuarios();
+    return
+  }
   try{
      const resp = await crearUsuario(valoresForm); 
      console.log(resp.data); 
@@ -35,16 +49,10 @@ const handlecrearUsuario = async (e) => {
   }
 }
 
-const handleeditUsuario = async (e, data) => { 
+const handleEditUsuario = async (e, usuario) => { 
   e.preventDefault();
-   console.log(valoresForm); 
-  try{
-     const resp = await crearUsuario(valoresForm); 
-     console.log(resp.data); 
-     setValoresForm({nombre: '', email: '', estado: '' }); 
-  }catch (error) {
-  console.log(error); 
-  }
+   setValoresForm({ nombre: usuario.nombre, email: usuario.email,
+    estado: usuario.estado, id: usuario._id });
 }
 
 return(
@@ -71,7 +79,7 @@ return(
      </select> 
    </div>
   </div>   
-  <button type="submit" className="btn btn-primary">Guardar</button>
+  <button className="btn btn-primary">Guardar</button>
   </form>
 
   <table className="table">
@@ -95,13 +103,14 @@ return(
           <td>{(usuario.fechaCreacion)}</td> 
           <td>{usuario.fechaActualizacion}</td> 
           <td> {usuario.estado}</td>
-          <td><button type="button" className="btn btn-primary" onClick={(e) => handleeditUsuario(e, usuario)}>
-          Editar
+          <td><button className="btn btn-primary"onClick={(e) => handleEditUsuario(e, usuario)}> Editar          
           </button>
           </td>
+
+
         </tr>
-  })
- }
+        })
+      }
   </tbody>
   </table>
   </div>

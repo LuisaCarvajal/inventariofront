@@ -1,15 +1,18 @@
 import React, {useState, useEffect} from 'react'
-import {getTipoEquipos, crearTipoEquipo} from '../../services/tipoEquipoService';
+import {getTiposEquipos, crearTipoEquipo,editTipoEquipo} from '../../services/tipoEquipoService';
+import { useParams } from 'react-router-dom';
+
 
 export const TipoView = () =>{
 
   const [valoresForm, setValoresForm] = useState({});
   const [ tipos, setTipos ]= useState([]);
   const { nombre='', estado=''} = valoresForm;
+  const { tipoId = '' } = useParams();
 
-  const listarTipos = async () => {
+  const listarTipoEquipo = async () => {
     try{
-      const resp = await getTipoEquipos();
+      const resp = await getTiposEquipos();
       setTipos(resp.data);
     }catch(error){
       console.log(error);
@@ -17,15 +20,27 @@ export const TipoView = () =>{
   }
 
   useEffect( () => { 
-    listarTipos();
+    listarTipoEquipo();
    }, []);
+
+   useEffect(() => {
+    setValoresForm({
+      nombre: tipos.nombre,
+      estado: tipos.estado,
+    })
+  }, [tipos]);
 
   const handleOnchange =  (e) => {
     setValoresForm ({...valoresForm, [e.target.name]: e.target.value});
   }
-   const handlecrearTipoEquipo = async (e) => {
+   const handlecrearTipo = async (e) => {
     e.preventDefault();
     console.log(valoresForm);
+    if (valoresForm.id) {
+      await editTipoEquipo(valoresForm.id, valoresForm)
+      await listarTipoEquipo();
+      return
+    }
     try{
       const resp = await crearTipoEquipo(valoresForm);
       console.log(resp.data);
@@ -35,9 +50,17 @@ export const TipoView = () =>{
     }
    }
 
+   const handleEditTipo = async (e, tipo) => {
+    e.preventDefault();
+    setValoresForm({
+      nombre: tipo.nombre,
+      estado: tipo.estado,
+      id: tipo._id });
+  }
+
 return(
   <div className="container-fluid">
-   <form onSubmit={(e) =>handlecrearTipoEquipo(e)}>
+   <form onSubmit={(e) =>handlecrearTipo(e)}>
     <div className="mb-3">
       <label  className="form-label">Nombre</label>
       <input  required name='nombre' value={nombre} type="text" className="form-control"
@@ -53,7 +76,7 @@ return(
      </select> 
    </div>
   </div>   
-  <button type="submit" className="btn btn-primary">Guardar</button>
+  <button className="btn btn-primary">Guardar</button>
   </form>
 
   <table className="table">
@@ -69,7 +92,10 @@ return(
         tipos.map( tipo => { 
           return <tr> 
           <td>{tipo.nombre}</td> 
-          <td>{tipo.estado}</td> 
+          <td>{tipo.estado}</td>
+          <td><button className="btn btn-primary"onClick={(e) => handleEditTipo(e, tipo)}> Editar          
+          </button>
+          </td> 
         </tr> 
         })
       }

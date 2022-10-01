@@ -1,13 +1,16 @@
 import React, {useState, useEffect} from 'react'
-import {getEstadosEquipos, crearEstadoEquipo} from '../../services/estadoEquipoService';
+import {getEstadosEquipos, crearEstadoEquipo, editEstadoEquipo, getEstadoporId} 
+    from '../../services/estadoEquipoService';
+import { useParams } from 'react-router-dom';
 
 export const EstadoView = () =>{
 
   const [valoresForm, setValoresForm] = useState({});
   const [ estados, setEstados ]= useState([]);
   const { nombre='', estado=''} = valoresForm;
+  const { estadoId= ''} = useParams();
 
-  const listarEstados = async () => {
+  const listarEstadoEquipo = async () => {
     try{
       const resp = await getEstadosEquipos();
       setEstados(resp.data);
@@ -17,15 +20,28 @@ export const EstadoView = () =>{
   }
 
   useEffect( () => { 
-    listarEstados();
+    listarEstadoEquipo();
    }, []);
+
+   useEffect(() =>{
+    setValoresForm({
+      nombre: estados.nombre,
+      estado: estados.estado,
+    })
+   }, [estados]);
 
   const handleOnchange =  (e) => {
     setValoresForm ({...valoresForm, [e.target.name]: e.target.value});
   }
-   const handlecrearEstadoEquipo = async (e) => {
+
+   const handlecrearEstado = async (e) => {
     e.preventDefault();
     console.log(valoresForm);
+    if (valoresForm.id) {
+      await editEstadoEquipo(valoresForm.id, valoresForm)
+      await listarEstadoEquipo();
+      return
+    }
     try{
       const resp = await crearEstadoEquipo(valoresForm);
       console.log(resp.data);
@@ -35,9 +51,17 @@ export const EstadoView = () =>{
     }
    }
 
+   const handleEditEstado = async (e, estado) => {
+    e.preventDefault();
+    setValoresForm({
+      nombre: estado.nombre,
+      estado: estado.estado,
+      id: estado._id});
+   }
+
 return(
   <div className="container-fluid">
-   <form onSubmit={(e) =>handlecrearEstadoEquipo(e)}>
+   <form onSubmit={(e) =>handlecrearEstado(e)}>
     <div className="mb-3">
       <label  className="form-label">Nombre</label>
       <input  required name='nombre' value={nombre} type="text" className="form-control"
@@ -53,7 +77,7 @@ return(
      </select> 
    </div>
   </div>     
-  <button type="submit" className="btn btn-primary">Guardar</button>
+  <button className="btn btn-primary">Guardar</button>
   </form>
 
   <table className="table">
@@ -69,12 +93,15 @@ return(
         estados.map( estados => { 
           return <tr> 
           <td>{estados.nombre}</td> 
-          <td>{estados.estado}</td> 
+          <td>{estados.estado}</td>
+          <td><button className="btn btn-primary"onClick={(e) => handleEditEstado(e, estado)}> Editar
+          </button>
+          </td> 
         </tr> 
         })
       }
-      </tbody>
+        </tbody>
       </table>
-      </div>
+    </div>
 )
 }

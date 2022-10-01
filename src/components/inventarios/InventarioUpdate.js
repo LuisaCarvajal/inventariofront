@@ -3,7 +3,7 @@ import { useParams} from 'react-router-dom';
 import {getInventarioporId, editInventario} from '../../services/inventarioService'
 import{getUsuarios} from '../../services/usuarioService';
 import{getMarcas} from '../../services/marcaService';
-import{getTipoEquipos} from '../../services/tipoEquipoService';
+import{getTiposEquipos} from '../../services/tipoEquipoService';
 import{getEstadosEquipos} from '../../services/estadoEquipoService';
 import Swal from 'sweetalert2';
 
@@ -46,7 +46,7 @@ export const InventarioUpdate = () => {
   
       const listarTipos = async () =>{
           try{
-              const {data} = await getTipoEquipos();        
+              const {data} = await getTiposEquipos();        
               setTipos(data);
           }catch (error){
               console.log(error);
